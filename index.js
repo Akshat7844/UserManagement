@@ -3,8 +3,6 @@ const config = require("./config");
 const app = express();
 
 const bodyParser = require("body-parser");
-
-const User = require("./models/User");
 require('dotenv').config();
 const PORT = process.env.PORT;
 

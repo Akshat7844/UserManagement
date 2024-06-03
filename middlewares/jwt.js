@@ -1,10 +1,13 @@
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
-
-const JWT_SECRET = '1234';
+const JWT_SECRET = process.env.JWT_SECRET;
 const jwtAuthmiddleware = (req, resp, next) =>{
 
     const token = req.headers.authorization.split(' ')[1];
+    console.log(
+        "the value of token is: "+ token
+    );
     if(!token) {
         return resp.status(401).json({error: 'unauthorized'});
     }
@@ -19,8 +22,6 @@ const jwtAuthmiddleware = (req, resp, next) =>{
         console.log(err);
         resp.status(401).json({err : 'Invalid token'});
     }
-
-    
 }
 
 

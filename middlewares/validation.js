@@ -20,7 +20,7 @@ const validateSignup = [
     .matches(/[@$!%*?&]/)
     .withMessage('Password must contain at least one special character'),
   body('role')
-    .isIn(['admin', 'user'])
+    .isIn(['Admin', 'User'])
     .withMessage('Role must be either admin or user')
 ];
 

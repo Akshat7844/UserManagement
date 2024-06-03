@@ -3,33 +3,16 @@ const router = express.Router();
 const User = require('./../models/User')
 const { jwtAuthmiddleware, generateJwt} = require("../middlewares/jwt");
 
-const { rolemiddleware} = require("../middlewares/roleMiddleware");
+const { roleMiddleware } = require("../middlewares/roleMiddleware");
 const passport = require('../auth');
 
 
 router.use(passport.initialize());
 const authMiddleware = passport.authenticate("local", { session: false });
 
-// role based authetication 
-const roleMiddleware = (requiredRole) => {
-    return async (req, resp, next) => {
-        try {
-            // Assuming your user object has a role property
-            if (req.body && req.body.role === requiredRole) {
-                next();
-            } else {
-                resp.status(403).send({ error: 'Access denied.' });
-            }
-        } catch (error) {
-            console.error("Error in roleMiddleware:", error);
-            resp.status(500).json({ error: "Internal server error" });
-        }
-    };
-};
-
 
 // route to ger all the users 
-router.get('/getAll', roleMiddleware("Admin"),  async (req, resp) => {
+router.get('',jwtAuthmiddleware, roleMiddleware("Admin"),  async (req, resp) => {
     try {
       const users = await User.find();
       console.log("Users successfully fetched!");
@@ -39,8 +22,8 @@ router.get('/getAll', roleMiddleware("Admin"),  async (req, resp) => {
     }
   });
 
-// route to update the user 
-  router.put("/:_id", authMiddleware, async (req, resp) => {
+// route to update the details of the user 
+  router.put("/:_id",authMiddleware,  async (req, resp) => {
     try {
       const newData = req.body;
       const savedData = await User.findByIdAndUpdate(req.params._id, newData, {

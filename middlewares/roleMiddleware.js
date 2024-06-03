@@ -1,10 +1,19 @@
 const express = require('express');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
+const JWT_SECRET = process.env.JWT_SECRET;
 const roleMiddleware = (requiredRole) => {
     return async (req, resp, next) => {
         try {
+            const token = req.headers.authorization.split(' ')[1];
+            const decoded = jwt.verify(token, JWT_SECRET);
+            
+            req.user = decoded;
+            // console.log("req.user",req.user);
+            // console.log("decoded",decoded);
             // Assuming your user object has a role property
-            if (req.body && req.body.role === requiredRole) {
+            if (req.user && req.user.role === requiredRole) {
                 next();
             } else {
                 resp.status(403).send({ error: 'Access denied.' });
@@ -16,4 +25,4 @@ const roleMiddleware = (requiredRole) => {
     };
 };
 
-module.exports = roleMiddleware;
+module.exports = {roleMiddleware};

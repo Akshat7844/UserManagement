@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { jwtAuthmiddleware, generateJwt } = require("../middlewares/jwt");
 const passport = require('../auth');
-const {comparePassword, User} = require('./../models/User');
+const {comparePassword} = require('./../models/User');
+const User = require('./../models/User');
 const { body, validationResult } = require('express-validator');
 const { validateSignup, checkValidation } = require('./../middlewares/validation');
 
@@ -11,7 +12,7 @@ router.post("/login", async (req, resp) => {
     try {
   
       const { username, password } = req.body;
-      const user = await User.findOne({ username: req.body.username});
+      const user = await User.findOne({ username: username});
                                         
       if (!user || !(await user.comparePassword(password))) {
         return resp.status(401).json({ error: "Invalid username or password" });
@@ -20,6 +21,7 @@ router.post("/login", async (req, resp) => {
       const payload = {
         id: user.id,
         username: user.username,
+        role: user.role
       };
   
       const token = generateJwt(payload);
@@ -34,8 +36,9 @@ router.post("/login", async (req, resp) => {
 
 // to signup or add the user in the database
 
-router.post("/signup",validateSignup,checkValidation, async (req, resp) => {
+router.post("/signup", validateSignup, checkValidation, async (req, resp) => {
     try {
+      
       const newUser = new User(req.body);
       const userSaved = await newUser.save();
   
